@@ -2,14 +2,17 @@
   "version": 2,
   "public": true,
   "cleanUrls": true,
+  "buildCommand": "bun run build",
+  "installCommand": "bun install",
+  "outputDirectory": "dist/public",
   "rewrites": [
     {
-      "source": "/assets/(.*)",
-      "destination": "/client/assets/$1"
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
     },
     {
       "source": "/(.*)",
-      "destination": "/client/index.html"
+      "destination": "/index.html"
     }
   ]
 }
