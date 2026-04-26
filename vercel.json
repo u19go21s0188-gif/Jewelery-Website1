@@ -1,5 +1,11 @@
 {
-  "rewrites":  [
-    {"source": "/(.*)", "destination": "/index.html"}
+  "framework": "vite",
+  "public": true,
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/client/index.html"
+    }
   ]
 }
