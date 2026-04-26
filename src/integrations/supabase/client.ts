@@ -7,17 +7,23 @@ type DB = Database;
 
 function createSupabaseClient() {
   // Use import.meta.env for client-side (Vite build-time replacement)
-  // For SSR: try VITE_ prefixed version first (for Vite), then fallback to regular env
   let SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
   let SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
   
-  // Fallback for server-side rendering or non-Vite environments
-  if (!SUPABASE_URL) SUPABASE_URL = import.meta.env.SUPABASE_URL || process.env.SUPABASE_URL;
-  if (!SUPABASE_PUBLISHABLE_KEY) SUPABASE_PUBLISHABLE_KEY = import.meta.env.SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY;
+  console.log('Environment check:', {
+    VITE_SUPABASE_URL: !!import.meta.env.VITE_SUPABASE_URL,
+    VITE_SUPABASE_PUBLISHABLE_KEY: !!import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+    SUPABASE_URL: !!import.meta.env.SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY: !!import.meta.env.SUPABASE_PUBLISHABLE_KEY,
+  });
 
   if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
+    console.error('Missing Supabase credentials:', {
+      url: SUPABASE_URL,
+      key: SUPABASE_PUBLISHABLE_KEY ? 'present' : 'missing'
+    });
     throw new Error(
-      'Missing Supabase environment variables. Ensure SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY (or SUPABASE_PUBLISHABLE_KEY) are set in your .env file.'
+      `Missing Supabase environment variables. URL: ${!!SUPABASE_URL}, Key: ${!!SUPABASE_PUBLISHABLE_KEY}`
     );
   }
 
