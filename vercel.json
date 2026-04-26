@@ -1,6 +1,7 @@
 {
-  "framework": "vite",
+  "version": 2,
   "public": true,
+  "framework": "vite",
   "cleanUrls": true,
   "rewrites": [
     {
