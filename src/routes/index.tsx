@@ -1,4 +1,6 @@
 
+
+
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,35 +15,53 @@ export const Route = createFileRoute("/")({
 function Index() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const load = () =>
-      supabase
-        .from("products")
-        .select("id,name,description,price,image_url,in_stock")
-        .eq("is_visible", true)
-        .eq("status", "active")
-        .order("created_at", { ascending: false })
-        .limit(8)
-        .then(({ data }) => {
+    const load = async () => {
+      try {
+        setError(null);
+        const { data, error: err } = await supabase
+          .from("products")
+          .select("id,name,description,price,image_url,in_stock")
+          .eq("is_visible", true)
+          .eq("status", "active")
+          .order("created_at", { ascending: false })
+          .limit(8);
+        
+        if (err) {
+          console.error("Supabase error:", err);
+          setError(err.message);
+          setProducts([]);
+        } else {
           setProducts(data ?? []);
-          setLoading(false);
-        });
-    load();
-    const ch = supabase
-      .channel("home-products")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "products" },
-        load,
-      )
-      .subscribe();
-    return () => {
-      supabase.removeChannel(ch);
+        }
+        setLoading(false);
+      } catch (e) {
+        console.error("Load error:", e);
+        setError(e instanceof Error ? e.message : "Failed to load products");
+        setLoading(false);
+      }
     };
-  }, []);
-
-  return (
+    
+    load();
+    
+    try {
+      const ch = supabase
+        .channel("home-products")
+        .on(
+          "postgres_changes",
+          { event: "*", schema: "public", table: "products" },
+          load,
+        )
+        .subscribe();
+      return () => {
+        supabase.removeChannel(ch);
+      };
+    } catch (e) {
+      console.error("Channel subscribe error:", e);
+    }
+  }, []);  return (
     <StorefrontLayout>
       {/* Hero */}
       <section className="relative overflow-hidden">
@@ -105,6 +125,15 @@ function Index() {
             {Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="aspect-square animate-pulse rounded-sm bg-ivory/5" />
             ))}
+          </div>
+        ) : error ? (
+          <div className="rounded-sm border border-gold/20 bg-gold/5 p-6 text-center">
+            <p className="text-sm text-ivory/80">
+              We're updating our collection. Please check back in a moment.
+            </p>
+            {import.meta.env.DEV && (
+              <p className="mt-2 text-xs text-ivory/50 font-mono">{error}</p>
+            )}
           </div>
         ) : products.length === 0 ? (
           <p className="text-center text-ivory/60">
