@@ -4,7 +4,7 @@
   "cleanUrls": true,
   "buildCommand": "bun run build",
   "installCommand": "bun install",
-  "outputDirectory": "dist/public",
+  "outputDirectory": "dist/client",
   "rewrites": [
     {
       "source": "/api/(.*)",
