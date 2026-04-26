@@ -71,10 +71,28 @@ function RootShell({ children }: { children: React.ReactNode }) {
 }
 
 function RootComponent() {
-  return (
-    <AuthProvider>
-      <Outlet />
-      <Toaster />
-    </AuthProvider>
-  );
+  try {
+    return (
+      <AuthProvider>
+        <Outlet />
+        <Toaster />
+      </AuthProvider>
+    );
+  } catch (err) {
+    console.error("Root component error:", err);
+    return (
+      <div className="storefront flex min-h-screen items-center justify-center px-4">
+        <div className="max-w-md text-center">
+          <h1 className="font-serif text-3xl gold-text">Welcome</h1>
+          <p className="mt-4 text-ivory/80">The site is loading. Please refresh if it doesn't load in a moment.</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="mt-6 inline-flex items-center justify-center rounded-sm bg-gold px-6 py-3 text-sm font-medium text-charcoal hover:bg-gold-soft"
+          >
+            Refresh Page
+          </button>
+        </div>
+      </div>
+    );
+  }
 }

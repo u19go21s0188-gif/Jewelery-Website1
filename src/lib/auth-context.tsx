@@ -23,42 +23,61 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, sess) => {
-      setSession(sess);
-      setUser(sess?.user ?? null);
-      if (sess?.user) {
-        setTimeout(() => {
-          supabase
-            .from("user_roles")
-            .select("role")
-            .eq("user_id", sess.user.id)
-            .eq("role", "admin")
-            .maybeSingle()
-            .then(({ data }) => setIsAdmin(!!data));
-        }, 0);
-      } else {
-        setIsAdmin(false);
-      }
-    });
+    const initAuth = async () => {
+      try {
+        const { data: sub } = supabase.auth.onAuthStateChange((_event, sess) => {
+          setSession(sess);
+          setUser(sess?.user ?? null);
+          if (sess?.user) {
+            setTimeout(async () => {
+              try {
+                const { data } = await supabase
+                  .from("user_roles")
+                  .select("role")
+                  .eq("user_id", sess.user.id)
+                  .eq("role", "admin")
+                  .maybeSingle();
+                setIsAdmin(!!data);
+              } catch (err: unknown) {
+                console.error("Auth check error:", err);
+              }
+            }, 0);
+          } else {
+            setIsAdmin(false);
+          }
+        });
 
-    supabase.auth.getSession().then(({ data: { session: sess } }) => {
-      setSession(sess);
-      setUser(sess?.user ?? null);
-      if (sess?.user) {
-        supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", sess.user.id)
-          .eq("role", "admin")
-          .maybeSingle()
-          .then(({ data }) => setIsAdmin(!!data));
-      }
-      setLoading(false);
-    });
+        const { data: { session: sess }, error: sessError } = await supabase.auth.getSession();
+        if (sessError) {
+          console.error("Session error:", sessError);
+          setError(sessError.message);
+        } else {
+          setSession(sess);
+          setUser(sess?.user ?? null);
+          if (sess?.user) {
+            await supabase
+              .from("user_roles")
+              .select("role")
+              .eq("user_id", sess.user.id)
+              .eq("role", "admin")
+              .maybeSingle()
+              .then(({ data }) => setIsAdmin(!!data));
+          }
+        }
+        setLoading(false);
 
-    return () => sub.subscription.unsubscribe();
+        return () => sub?.subscription?.unsubscribe?.();
+      } catch (err) {
+        console.error("Auth init error:", err);
+        setError(err instanceof Error ? err.message : "Auth initialization failed");
+        setLoading(false);
+      }
+    };
+
+    initAuth();
   }, []);
 
   const value: AuthState = {
