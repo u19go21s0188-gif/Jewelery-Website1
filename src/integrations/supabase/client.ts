@@ -9,21 +9,10 @@ function createSupabaseClient() {
   // Use import.meta.env for client-side (Vite build-time replacement)
   let SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
   let SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-  
-  console.log('Environment check:', {
-    VITE_SUPABASE_URL: !!import.meta.env.VITE_SUPABASE_URL,
-    VITE_SUPABASE_PUBLISHABLE_KEY: !!import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-    SUPABASE_URL: !!import.meta.env.SUPABASE_URL,
-    SUPABASE_PUBLISHABLE_KEY: !!import.meta.env.SUPABASE_PUBLISHABLE_KEY,
-  });
 
   if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
-    console.error('Missing Supabase credentials:', {
-      url: SUPABASE_URL,
-      key: SUPABASE_PUBLISHABLE_KEY ? 'present' : 'missing'
-    });
     throw new Error(
-      `Missing Supabase environment variables. URL: ${!!SUPABASE_URL}, Key: ${!!SUPABASE_PUBLISHABLE_KEY}`
+      'Missing Supabase environment variables. Please check VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY.'
     );
   }
 
