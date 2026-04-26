@@ -1,9 +1,12 @@
 {
   "version": 2,
   "public": true,
-  "framework": "vite",
   "cleanUrls": true,
   "rewrites": [
+    {
+      "source": "/assets/(.*)",
+      "destination": "/client/assets/$1"
+    },
     {
       "source": "/(.*)",
       "destination": "/client/index.html"
