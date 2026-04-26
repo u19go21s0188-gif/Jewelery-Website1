@@ -1,21 +1,3 @@
 {
-  "version": 2,
-  "buildCommand": "bun run build",
-  "installCommand": "bun install",
-  "serverlessFunctionRegion": "iad1",
-  "functions": {
-    "dist/server/index.js": {
-      "runtime": "nodejs20.x"
-    }
-  },
-  "rewrites": [
-    {
-      "source": "/client/(.*)",
-      "destination": "/client/$1"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/dist/server/index.js"
-    }
-  ]
+  "version": 2
 }
