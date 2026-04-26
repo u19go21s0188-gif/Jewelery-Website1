@@ -1,14 +1,5 @@
 {
-  "buildCommand": "npm run build",
-  "devCommand": "npm run dev",
-  "installCommand": "npm install",
-  "framework": "vite",
-  "regions": ["iad1"],
-  "git": {
-    "silent": false
-  },
-  "github": {
-    "enabled": true,
-    "autoJobCancelPrevDeployments": true
-  }
+  "rewrites":  [
+    {"source": "/(.*)", "destination": "/index.html"}
+  ]
 }
